@@ -34,31 +34,30 @@
 (defn print-board [board]
   (println (apply str (repeat 37 "-")))
   (doseq [x (range 0 9)]
-    (print "| ")
+    (print "|")
     (doseq [y (range 0 9)]
-      (print (or (:spot (board [x y])) ".") "| "))
+      (print "" (or (:spot (board [x y])) ".") "|"))
     (print "\n")
     (println (apply str (repeat 37 "-")))))
 
+(def spots (apply vector (for [y (range 0 9)
+                               x (range 0 9)]
+                           [x y])))
+
 (defn build []
   (loop [board {}
-         done []
-         togo (apply list
-                     (for [y (range 0 9)
-                           x (range 0 9)]
-                       [x y]))]
-    (let [pos (first togo)
+         idx 0]
+    (let [pos (spots idx)
           spot (or (board pos)
-                   {:opts (random-spots board pos)})]
+                   {:opts (random-spots board pos)})
+          opts (:opts spot)]
       (cond
-        (= 1 (count togo)) (assoc board pos (assoc spot :spot (first (:opts spot))))
-        (seq (:opts spot)) (recur (assoc board pos (assoc spot :spot (first (:opts spot))))
-                                  (conj done pos)
-                                  (pop togo))
+        (= idx 80) (assoc board pos (assoc spot :spot (first opts)))
+        (seq opts) (recur (assoc board pos (assoc spot :spot (first opts)))
+                          (inc idx))
         :else (recur (-> (dissoc board pos)
-                         (update-in [(last done) :opts] pop))
-                     (pop done)
-                     (conj togo (last done)))))))
+                         (update-in [(spots (dec idx)) :opts] pop))
+                     (dec idx))))))
 
 (defn -main
   "Generate and print a sudoku board."
