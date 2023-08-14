@@ -40,9 +40,9 @@
     (print "\n")
     (println (apply str (repeat 37 "-")))))
 
-(def spots (apply vector (for [y (range 0 9)
-                               x (range 0 9)]
-                           [x y])))
+(def spots (vec (for [y (range 0 9)
+                      x (range 0 9)]
+                  [x y])))
 
 (defn build []
   (loop [board {}
@@ -62,4 +62,4 @@
 (defn -main
   "Generate and print a sudoku board."
   [& _]
-  (print-board (build)))
+  (print-board (time (build))))
